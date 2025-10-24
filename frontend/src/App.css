@@ -1,0 +1,124 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: #252526;
+  border-bottom: 1px solid #3e3e42;
+}
+
+.app-header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #cccccc;
+}
+
+.reload-btn {
+  padding: 0.5rem 1rem;
+  background-color: #0e639c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.reload-btn:hover:not(:disabled) {
+  background-color: #1177bb;
+}
+
+.reload-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.app-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sidebar {
+  min-width: 200px;
+  max-width: 600px;
+  background-color: #252526;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.sidebar h2 {
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #cccccc;
+  border-bottom: 1px solid #3e3e42;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #1e1e1e;
+}
+
+.loading {
+  padding: 2rem;
+  text-align: center;
+  color: #858585;
+}
+
+.error {
+  padding: 1rem;
+  margin: 1rem;
+  background-color: #5a1d1d;
+  border: 1px solid #be1100;
+  border-radius: 4px;
+  color: #f48771;
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #858585;
+  font-size: 1.1rem;
+}
+
+.resize-handle {
+  width: 5px;
+  background-color: #3e3e42;
+  cursor: col-resize;
+  flex-shrink: 0;
+  position: relative;
+  transition: background-color 0.2s;
+}
+
+.resize-handle:hover,
+.resize-handle.resizing {
+  background-color: #0e639c;
+}
+
+.resize-handle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -2px;
+  right: -2px;
+}
+
+body.resizing {
+  cursor: col-resize;
+  user-select: none;
+}

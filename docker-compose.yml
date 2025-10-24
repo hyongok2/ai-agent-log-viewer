@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: log-viewer-backend:v1.0.0
+    container_name: log-viewer-backend
+    ports:
+      - "5701:5701"
+    volumes:
+      # Mount your log directory here
+      - ./backend/logs:/logs
+      # Or use absolute path:
+      # - /path/to/your/logs:/logs
+    environment:
+      - LOG_PATH=/logs
+      - PORT=5701
+      # Auto cleanup settings
+      - ENABLE_AUTO_CLEANUP=true        # Set to 'false' to disable
+      - LOG_RETENTION_DAYS=7            # Keep logs for 7 days
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:5701/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: log-viewer-frontend:v1.0.0
+    container_name: log-viewer-frontend
+    ports:
+      - "5700:5700"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+networks:
+  default:
+    name: log-viewer-network

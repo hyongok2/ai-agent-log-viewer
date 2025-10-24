@@ -1,0 +1,10 @@
+{
+  "logPath": "./logs",
+  "fileExtensions": [".log", ".txt", ".json"],
+  "port": 5701,
+  "cors": {
+    "origin": "*",
+    "methods": ["GET", "POST", "PUT", "DELETE"],
+    "allowedHeaders": ["Content-Type", "Authorization"]
+  }
+}

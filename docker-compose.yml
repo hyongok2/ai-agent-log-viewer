@@ -35,6 +35,14 @@ services:
     container_name: log-viewer-frontend
     ports:
       - "5700:5700"
+    environment:
+      # IMPORTANT: Set this to your server's IP or domain
+      # The browser needs to access this URL
+      - API_URL=http://localhost:5701
+
+      # For remote servers, use server IP or domain:
+      # - API_URL=http://192.168.1.100:5701
+      # - API_URL=http://your-domain.com:5701
     depends_on:
       - backend
     restart: unless-stopped

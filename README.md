@@ -53,6 +53,40 @@ npm run dev
 
 ## Configuration
 
+### Frontend Configuration (API URL)
+
+✅ **Runtime Configuration** - Change API URL without rebuilding!
+
+**Development (local):**
+```bash
+# Edit frontend/public/config.js
+window.APP_CONFIG = {
+  API_URL: 'http://localhost:5701'
+};
+```
+
+**Docker Deployment:**
+
+Simply edit the environment variable in `docker-compose.yml`:
+
+```yaml
+# docker-compose.yml
+frontend:
+  environment:
+    - API_URL=http://192.168.1.100:5701  # Your server IP
+    # or
+    - API_URL=http://your-domain.com:5701
+```
+
+**Change IP without rebuild:**
+```bash
+# 1. Edit docker-compose.yml to change API_URL
+# 2. Restart only the frontend container
+docker-compose up -d frontend
+```
+
+⚠️ **Important**: Use an IP/domain the browser can access (not `http://backend:5701`).
+
 ### Backend Configuration
 
 Edit [backend/src/config/default.json](backend/src/config/default.json):
@@ -60,7 +94,7 @@ Edit [backend/src/config/default.json](backend/src/config/default.json):
 ```json
 {
   "logPath": "./logs",
-  "fileExtensions": [".log", ".txt"],
+  "fileExtensions": [".log", ".txt", ".json"],
   "port": 5701
 }
 ```
@@ -255,10 +289,104 @@ docker push your-registry/log-viewer-frontend:v1.0.0
 cd backend
 docker build -t log-viewer-backend:v1.0.0 .
 
-# Frontend
+# Frontend (with API URL configuration)
 cd frontend
-npm run build
-docker build -t log-viewer-frontend:v1.0.0 .
+docker build -t log-viewer-frontend:v1.0.0 \
+  --build-arg VITE_API_URL=http://192.168.1.100:5701 .
+```
+
+## Deployment Guide
+
+### Closed Network (Air-Gapped) Deployment
+
+✅ **No IP hardcoding needed** - Configure at runtime!
+
+**Step 1: Build images once (on a machine with internet)**
+```bash
+# Build images (no IP configuration needed at build time)
+docker-compose build
+```
+
+**Step 2: Save images to tar files**
+```bash
+docker save log-viewer-backend:v1.0.0 -o log-viewer-backend-v1.0.0.tar
+docker save log-viewer-frontend:v1.0.0 -o log-viewer-frontend-v1.0.0.tar
+```
+
+**Step 3: Transfer files to target server**
+```bash
+# Copy these files to your server:
+# - log-viewer-backend-v1.0.0.tar
+# - log-viewer-frontend-v1.0.0.tar
+# - docker-compose.yml
+```
+
+**Step 4: Load images on target server**
+```bash
+docker load -i log-viewer-backend-v1.0.0.tar
+docker load -i log-viewer-frontend-v1.0.0.tar
+```
+
+**Step 5: Configure for your environment**
+```bash
+# Edit docker-compose.yml:
+# 1. Set log directory volume path (line 14)
+# 2. Set API_URL to your server IP (line 41)
+
+# Example:
+# volumes:
+#   - /var/log/ai-agent:/logs
+# environment:
+#   - API_URL=http://192.168.10.50:5701
+```
+
+**Step 6: Start services**
+```bash
+docker-compose up -d
+
+# Check status:
+docker-compose ps
+docker-compose logs -f
+```
+
+**Need to change IP later?**
+```bash
+# 1. Edit API_URL in docker-compose.yml
+# 2. Restart frontend only (no rebuild needed!)
+docker-compose up -d frontend
+```
+
+**Step 6: Access the UI**
+```
+Open browser: http://<server-ip>:5700
+```
+
+### Regular Deployment (with Registry)
+
+**Step 1: Build and tag**
+```bash
+# Set your registry and server IP
+export REGISTRY=your-registry.com
+export SERVER_IP=192.168.1.100
+
+# Build with API URL
+docker build -t ${REGISTRY}/log-viewer-backend:v1.0.0 ./backend
+docker build -t ${REGISTRY}/log-viewer-frontend:v1.0.0 \
+  --build-arg VITE_API_URL=http://${SERVER_IP}:5701 \
+  ./frontend
+```
+
+**Step 2: Push to registry**
+```bash
+docker push ${REGISTRY}/log-viewer-backend:v1.0.0
+docker push ${REGISTRY}/log-viewer-frontend:v1.0.0
+```
+
+**Step 3: Pull and run on target server**
+```bash
+docker pull ${REGISTRY}/log-viewer-backend:v1.0.0
+docker pull ${REGISTRY}/log-viewer-frontend:v1.0.0
+docker-compose up -d
 ```
 
 ## Version History

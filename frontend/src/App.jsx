@@ -3,7 +3,8 @@ import FileTree from './components/FileTree';
 import LogViewer from './components/LogViewer';
 import './App.css';
 
-const API_URL = 'http://localhost:5701';
+// Runtime configuration (from config.js) takes precedence over build-time env
+const API_URL = window.APP_CONFIG?.API_URL || import.meta.env.VITE_API_URL || 'http://localhost:5701';
 
 function App() {
   const [tree, setTree] = useState(null);

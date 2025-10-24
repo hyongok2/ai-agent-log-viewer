@@ -12,7 +12,7 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Build for production
+# Build for production (no hardcoded API URL)
 RUN npm run build
 
 # Production stage with nginx
@@ -24,8 +24,13 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+# Copy entrypoint script
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
 # Expose port
 EXPOSE 5700
 
-# Start nginx
+# Use entrypoint to generate config.js at runtime
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]

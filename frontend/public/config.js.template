@@ -1,0 +1,4 @@
+// Runtime configuration - injected by Docker at startup
+window.APP_CONFIG = {
+  API_URL: '${API_URL}'
+};

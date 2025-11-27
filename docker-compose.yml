@@ -5,7 +5,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    image: log-viewer-backend:v1.0.0
+    image: log-viewer-backend:v1.0.1
     container_name: log-viewer-backend
     ports:
       - "5701:5701"

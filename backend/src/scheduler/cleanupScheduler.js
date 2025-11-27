@@ -31,6 +31,17 @@ async function cleanupOldFiles(dirPath, retentionDays) {
           const result = await cleanupOldFiles(itemPath, retentionDays);
           deleted += result.deleted;
           errors += result.errors;
+
+          // Check if directory is empty after cleanup
+          try {
+            const remainingItems = await fs.readdir(itemPath);
+            if (remainingItems.length === 0) {
+              await fs.rmdir(itemPath);
+              console.log(`Deleted empty directory: ${itemPath}`);
+            }
+          } catch (err) {
+            console.error(`Error checking/deleting empty directory ${itemPath}:`, err.message);
+          }
         } else {
           // Check if file is older than retention period
           const fileAge = now - itemStats.mtime.getTime();
